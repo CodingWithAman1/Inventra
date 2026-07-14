@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>INVENTRA</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <style>
+        body {
+            padding-top: 70px;
+        }
+
+        .carousel-item img {
+            height: 600px;
+            object-fit: cover;
+        }
+
+        @media (max-width:768px) {
+            .carousel-item img {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <header>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top shadow-sm">
+            <div class="container">
+
+                <a class="navbar-brand d-flex align-items-center" href="#">
+                    <img src="{{ url_for('static', filename='asset/LOGO.png') }}" alt="Logo" width="35" class="me-2">
+                    <strong>INVENTRA</strong>
+                </a>
+
+                <button class="navbar-toggler" type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav"
+                    aria-controls="navbarNav"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation">
+
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+
+                    <ul class="navbar-nav me-auto">
+
+                        <li class="nav-item">
+                            <a class="nav-link active" >Home</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{url_for('inventory')}}">Inventory</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{url_for('supplier')}}">Suppliers</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{url_for('reports')}}">Reports</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{url_for('contact')}}">Contact</a>
+                        </li>
+
+                    </ul>
+
+                    <form class="d-flex">
+                        <input class="form-control me-2"
+                            type="search"
+                            placeholder="Search">
+
+                        <button class="btn btn-outline-success">
+                            Search
+                        </button>
+                    </form>
+
+                </div>
+
+            </div>
+        </nav>
+    </header>
+
+    <main>
+
+        <!-- Carousel -->
+
+        <div id="carouselExampleCaptions"
+            class="carousel slide"
+            data-bs-ride="carousel">
+
+            <div class="carousel-indicators">
+                <button type="button"
+                    data-bs-target="#carouselExampleCaptions"
+                    data-bs-slide-to="0"
+                    class="active"></button>
+
+                <button type="button"
+                    data-bs-target="#carouselExampleCaptions"
+                    data-bs-slide-to="1"></button>
+
+                <button type="button"
+                    data-bs-target="#carouselExampleCaptions"
+                    data-bs-slide-to="2"></button>
+            </div>
+
+            <div class="carousel-inner">
+
+                <div class="carousel-item active">
+                    <img src="{{ url_for('static', filename='asset/1.png') }}"
+                        class="d-block w-100"
+                        alt="Inventory">
+                </div>
+
+                <div class="carousel-item">
+                    <img src="{{url_for('static', filename='asset/2.png')}}"
+                        class="d-block w-100"
+                        alt="Warehouse">
+                </div>
+
+                <div class="carousel-item">
+                    <img src="{{url_for('static', filename='asset/3.png')}}"
+                        class="d-block w-100"
+                        alt="Dashboard">
+                </div>
+
+            </div>
+
+            <button class="carousel-control-prev"
+                type="button"
+                data-bs-target="#carouselExampleCaptions"
+                data-bs-slide="prev">
+
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+
+            <button class="carousel-control-next"
+                type="button"
+                data-bs-target="#carouselExampleCaptions"
+                data-bs-slide="next">
+
+                <span class="carousel-control-next-icon"></span>
+            </button>
+
+        </div>
+
+
+        <!--GRID-->
+<div class="container my-5">
+
+    <div class="row g-4">
+
+        <!-- Card 1 -->
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100">
+                <img src="{{ url_for('static', filename='asset/INVENTORY.png') }}" class="card-img-top" alt="Inventory" style="width: 25%; align-self: center;">
+                <div class="card-body">
+                    <h5 class="card-title">Inventory Tracking</h5>
+                    <p class="card-text">
+                        <ul>
+                          <li>Add Products</li>
+                          <li>Edit Products</li>
+                          <li>Delete Products</li>
+                          <li>View Stock</li>
+                        </ul>
+                    </p>
+                    <a href="{{url_for('inventory')}}" class="btn btn-success">Make/Edit inventory</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100">
+                <img src="{{ url_for('static', filename='asset/STOCK.png') }}" class="card-img-top" alt="Orders" style="width: 25%; align-self: center;">
+                <div class="card-body">
+                    <h5 class="card-title">Supplier Details</h5>
+                    <p class="card-text">
+                        <ul>
+                          <li>Add suppliers</li>
+                          <li>Edit details</li>
+                          <li>Delete suppliers</li>
+                          <li>View supplier information and orders</li>
+                        </ul>
+                    </p>
+                    <a href="{{url_for('supplier')}}" class="btn btn-success">Open suppliers list and data.</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100">
+                <img src="{{ url_for('static', filename='asset/GRAPH.png') }}" class="card-img-top" alt="Reports" style="width: 25%; align-self: center;">
+                <div class="card-body">
+                    <h5 class="card-title">Reports & Analytics</h5>
+                    <p class="card-text">
+                      <ul>
+                      <li>View analytics</li>
+                      <li>Stock insights</li>
+                      <li>Reports</li>
+                      </ul>
+                    </p>
+                    <a href="{{url_for('reports')}}" class="btn btn-success">Learn More</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+<footer class="bg-dark text-light mt-5">
+
+    <div class="container py-5">
+
+        <div class="row">
+
+            <!-- Logo & About -->
+            <div class="col-lg-4 mb-4">
+
+                <div class="d-flex align-items-center mb-3">
+
+                    <img src="{{ url_for('static', filename='asset/LOGO.png') }}"
+                         width="45"
+                         class="me-2">
+
+                    <h4 class="mb-0">
+                        INVENTRA
+                    </h4>
+
+                </div>
+
+                <p class="text-secondary">
+                    INVENTRA is a modern inventory management system
+                    designed to simplify product tracking, supplier
+                    management and inventory analytics through an
+                    intuitive web interface.
+                </p>
+
+            </div>
+
+            <!-- Quick Links -->
+            <div class="col-lg-2 col-md-6 mb-4">
+
+                <h5>Quick Links</h5>
+
+                <ul class="list-unstyled">
+
+                    <li>
+                        <a href="{{ url_for('home') }}"
+                           class="text-decoration-none text-secondary">
+                            Home
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ url_for('inventory') }}"
+                           class="text-decoration-none text-secondary">
+                            Inventory
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ url_for('supplier') }}"
+                           class="text-decoration-none text-secondary">
+                            Suppliers
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ url_for('reports') }}"
+                           class="text-decoration-none text-secondary">
+                            Reports
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ url_for('contact') }}"
+                           class="text-decoration-none text-secondary">
+                            Contact
+                        </a>
+                    </li>
+
+                </ul>
+
+            </div>
+
+            <!-- Contact -->
+            <div class="col-lg-3 col-md-6 mb-4">
+
+                <h5>Contact</h5>
+
+                <p class="text-secondary mb-2">
+                    📧 shruti.sharma6386@gmail.com
+                </p>
+
+                <p class="text-secondary mb-2">
+                    📞 +91 96906 83156
+                </p>
+
+                <p class="text-secondary">
+                    📍 Greater Noida, Uttar Pradesh
+                </p>
+
+            </div>
+
+            <!-- Developer -->
+            <div class="col-lg-3 mb-4">
+
+                <h5>Developer</h5>
+
+                <p class="text-secondary">
+                    Developed by
+                    <strong class="text-white">
+                        Aman Sharma
+                    </strong>
+                </p>
+
+                <p class="text-secondary">
+                    Flask • Bootstrap • SQLAlchemy • SQLite
+                </p>
+
+                <div class="d-flex gap-2">
+
+                    <a href="https://github.com/CodingWithAman1"
+                       class="btn btn-outline-light btn-sm">
+                        GitHub
+                    </a>
+
+                    <a href="https://www.linkedin.com/in/aman-sharma-web/"
+                       class="btn btn-outline-light btn-sm">
+                        LinkedIn
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <hr class="border-secondary">
+
+        <div class="text-center text-secondary">
+
+            © 2026 INVENTRA. All Rights Reserved.<br>
+
+            Designed & Developed by
+            <span class="text-white fw-bold">
+                Aman Sharma
+            </span>
+
+        </div>
+
+    </div>
+
+</footer>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

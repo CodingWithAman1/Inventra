@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>INVENTRA</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <style>
+        body {
+            padding-top: 70px;
+        }
+
+        .carousel-item img {
+            height: 600px;
+            object-fit: cover;
+        }
+
+        @media (max-width:768px) {
+            .carousel-item img {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <header>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top shadow-sm">
+            <div class="container">
+
+                <a class="navbar-brand d-flex align-items-center" href="#">
+                    <img src="{{ url_for('static', filename='asset/LOGO.png') }}" alt="Logo" width="35" class="me-2">
+                    <strong>INVENTRA</strong>
+                </a>
+
+                <button class="navbar-toggler" type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav"
+                    aria-controls="navbarNav"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation">
+
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+
+                    <ul class="navbar-nav me-auto">
+
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{url_for('home')}}">Home</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{url_for('inventory')}}">Inventory</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{url_for('supplier')}}">Suppliers</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" >Reports</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{url_for('contact')}}">Contact</a>
+                        </li>
+
+                    </ul>
+
+                    <form class="d-flex">
+                        <input class="form-control me-2"
+                            type="search"
+                            placeholder="Search">
+
+                        <button class="btn btn-outline-success">
+                            Search
+                        </button>
+                    </form>
+
+                </div>
+
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container my-5">
+
+    <div class="row g-4">
+
+        <!-- Total Products -->
+        <div class="col-md-6 col-lg-3">
+
+            <div class="card text-bg-primary shadow h-100">
+
+                <div class="card-body text-center">
+
+                    <h1>📦</h1>
+
+                    <h5>Total Products</h5>
+
+                    <h2>{{ total_products }}</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Total Suppliers -->
+        <div class="col-md-6 col-lg-3">
+
+            <div class="card text-bg-success shadow h-100">
+
+                <div class="card-body text-center">
+
+                    <h1>🏢</h1>
+
+                    <h5>Total Suppliers</h5>
+
+                    <h2>{{ total_suppliers }}</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Inventory Value -->
+        <div class="col-md-6 col-lg-3">
+
+            <div class="card text-bg-warning shadow h-100">
+
+                <div class="card-body text-center">
+
+                    <h1>💰</h1>
+
+                    <h5>Inventory Value</h5>
+
+                    <h2>₹{{ inventory_value }}</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Low Stock -->
+        <div class="col-md-6 col-lg-3">
+
+            <div class="card text-bg-danger shadow h-100">
+
+                <div class="card-body text-center">
+
+                    <h1>⚠️</h1>
+
+                    <h5>Low Stock</h5>
+
+                    <h2>{{ low_stock }}</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<div class="container my-5">
+
+    <div class="card shadow">
+
+        <div class="card-header bg-primary text-white">
+
+            <h4 class="mb-0">
+                Inventory Value by Product
+            </h4>
+
+        </div>
+
+        <div class="card-body">
+
+            <canvas id="inventoryChart"></canvas>
+
+        </div>
+
+    </div>
+
+</div>
+<div class="container my-5" >
+
+    <div class="card shadow">
+
+        <div class="card-header bg-success text-white">
+
+            <h4 class="mb-0">
+                Product Distribution
+            </h4>
+
+        </div>
+
+        <div class="card-body" style="height:50vh;  align-self: center;">
+
+            <canvas id="distributionChart" ></canvas>
+
+        </div>
+
+    </div>
+
+</div>
+<div class="container my-5">
+
+    <div class="card shadow">
+
+        <div class="card-header bg-danger text-white">
+
+            <h4 class="mb-0">
+                Low Stock Products
+            </h4>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover">
+
+                    <thead class="table-dark">
+
+                        <tr>
+
+                            <th>ID</th>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Status</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for item in low_stock_items %}
+
+                        <tr>
+
+                            <td>{{ item.id }}</td>
+
+                            <td>{{ item.name }}</td>
+
+                            <td>{{ item.quantity }}</td>
+
+                            <td>
+
+                                {% if item.quantity <= 3 %}
+
+                                <span class="badge bg-danger">
+                                    Critical
+                                </span>
+
+                                {% elif item.quantity <= 7 %}
+
+                                <span class="badge bg-warning text-dark">
+                                    Low
+                                </span>
+
+                                {% else %}
+
+                                <span class="badge bg-secondary">
+                                    Reorder Soon
+                                </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<div class="container my-5">
+
+    <div class="card shadow">
+
+        <div class="card-header bg-info text-white">
+
+            <h4 class="mb-0">
+                Supplier Contribution
+            </h4>
+
+        </div>
+
+        <div class="card-body">
+
+            <canvas id="supplierChart"></canvas>
+
+        </div>
+
+    </div>
+
+</div>
+<footer class="bg-dark text-light mt-5">
+
+    <div class="container py-5">
+
+        <div class="row">
+
+            <!-- Logo & About -->
+            <div class="col-lg-4 mb-4">
+
+                <div class="d-flex align-items-center mb-3">
+
+                    <img src="{{ url_for('static', filename='asset/LOGO.png') }}"
+                         width="45"
+                         class="me-2">
+
+                    <h4 class="mb-0">
+                        INVENTRA
+                    </h4>
+
+                </div>
+
+                <p class="text-secondary">
+                    INVENTRA is a modern inventory management system
+                    designed to simplify product tracking, supplier
+                    management and inventory analytics through an
+                    intuitive web interface.
+                </p>
+
+            </div>
+
+            <!-- Quick Links -->
+            <div class="col-lg-2 col-md-6 mb-4">
+
+                <h5>Quick Links</h5>
+
+                <ul class="list-unstyled">
+
+                    <li>
+                        <a href="{{ url_for('home') }}"
+                           class="text-decoration-none text-secondary">
+                            Home
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ url_for('inventory') }}"
+                           class="text-decoration-none text-secondary">
+                            Inventory
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ url_for('supplier') }}"
+                           class="text-decoration-none text-secondary">
+                            Suppliers
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ url_for('reports') }}"
+                           class="text-decoration-none text-secondary">
+                            Reports
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ url_for('contact') }}"
+                           class="text-decoration-none text-secondary">
+                            Contact
+                        </a>
+                    </li>
+
+                </ul>
+
+            </div>
+
+            <!-- Contact -->
+            <div class="col-lg-3 col-md-6 mb-4">
+
+                <h5>Contact</h5>
+
+                <p class="text-secondary mb-2">
+                    📧 shruti.sharma6386@gmail.com
+                </p>
+
+                <p class="text-secondary mb-2">
+                    📞 +91 96906 83156
+                </p>
+
+                <p class="text-secondary">
+                    📍 Greater Noida, Uttar Pradesh
+                </p>
+
+            </div>
+
+            <!-- Developer -->
+            <div class="col-lg-3 mb-4">
+
+                <h5>Developer</h5>
+
+                <p class="text-secondary">
+                    Developed by
+                    <strong class="text-white">
+                        Aman Sharma
+                    </strong>
+                </p>
+
+                <p class="text-secondary">
+                    Flask • Bootstrap • SQLAlchemy • SQLite
+                </p>
+
+                <div class="d-flex gap-2">
+
+                    <a href="https://github.com/CodingWithAman1"
+                       class="btn btn-outline-light btn-sm">
+                        GitHub
+                    </a>
+
+                    <a href="https://www.linkedin.com/in/aman-sharma-web/"
+                       class="btn btn-outline-light btn-sm">
+                        LinkedIn
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <hr class="border-secondary">
+
+        <div class="text-center text-secondary">
+
+            © 2026 INVENTRA. All Rights Reserved.<br>
+
+            Designed & Developed by
+            <span class="text-white fw-bold">
+                Aman Sharma
+            </span>
+
+        </div>
+
+    </div>
+
+</footer>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+
+const supplierLabels = {{ supplier_labels|tojson }};
+const supplierProducts = {{ supplier_products|tojson }};
+
+new Chart(document.getElementById("supplierChart"), {
+
+    type: "bar",
+
+    data: {
+
+        labels: supplierLabels,
+
+        datasets: [{
+
+            label: "Products Supplied",
+
+            data: supplierProducts,
+
+            borderWidth: 1
+
+        }]
+
+    },
+
+    options: {
+
+        indexAxis: 'y',
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        plugins: {
+
+            legend: {
+
+                display: false
+
+            }
+
+        },
+
+        scales: {
+
+            x: {
+
+                beginAtZero: true
+
+            }
+
+        }
+
+    }
+
+});
+
+</script>
+    <script>
+
+const distributionLabels = {{ distribution_labels|tojson }};
+const distributionValues = {{ distribution_quantity|tojson }};
+
+new Chart(document.getElementById("distributionChart"), {
+
+    type: "pie",
+
+    data: {
+
+        labels: distributionLabels,
+
+        datasets: [{
+
+            data: distributionValues
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+
+        plugins: {
+
+            legend: {
+
+                position: "bottom"
+
+            }
+
+        }
+
+    }
+
+});
+
+</script>
+    <script>
+
+const labels = {{ product_names|tojson }};
+const values = {{ inventory_values|tojson }};
+
+new Chart(document.getElementById("inventoryChart"), {
+
+    type: "bar",
+
+    data: {
+
+        labels: labels,
+
+        datasets: [{
+
+            label: "Inventory Value (₹)",
+
+            data: values,
+
+            borderWidth: 1
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+
+        plugins: {
+
+            legend: {
+
+                display: false
+
+            }
+
+        },
+
+        scales: {
+
+            y: {
+
+                beginAtZero: true
+
+            }
+
+        }
+
+    }
+
+});
+
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+</html>
