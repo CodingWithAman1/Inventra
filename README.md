@@ -70,18 +70,16 @@
 
 ```text
 mysterious-mendeleev/
+├── api/
+│   └── index.py               # Vercel serverless WSGI entrypoint
+├── vercel.json                # Vercel serverless routing configuration
+├── .vercelignore              # Files excluded from Vercel build
 ├── app.py                     # Main Flask application & SQLAlchemy models
 ├── requirements.txt           # Python dependencies
 ├── README.md                  # Project documentation & guide
 ├── .gitignore                 # Git ignore rules
 ├── static/
 │   ├── asset/                 # Application logos, graphics, and carousel banners
-│   │   ├── LOGO.png
-│   │   ├── INVENTORY.png
-│   │   ├── STOCK.png
-│   │   ├── GRAPH.png
-│   │   ├── 1.png, 2.png, 3.png
-│   │   └── ...
 │   ├── css/
 │   │   └── style.css          # Custom modern UI styling & polish
 │   └── js/
@@ -98,7 +96,23 @@ mysterious-mendeleev/
 
 ---
 
-## ⚙️ Installation & Setup
+## 🚀 Deploying to Vercel
+
+INVENTRA is configured for 1-click deployment on [Vercel](https://vercel.com):
+
+1. **Push to GitHub:** Commit your latest changes and push to your GitHub repository.
+2. **Import to Vercel:**
+   - Go to your [Vercel Dashboard](https://vercel.com/dashboard) and click **"Add New..."** > **"Project"**.
+   - Select your `Inventra` repository.
+   - Framework Preset: **Other** (Vercel automatically detects `vercel.json` and Python).
+3. **Optional Environment Variables:**
+   - `SECRET_KEY`: Any secure random string for Flask sessions.
+   - `DATABASE_URL`: (Optional) Connect an external PostgreSQL database (e.g. Neon, Supabase, Vercel Postgres) for persistent storage across cold starts. If omitted, INVENTRA uses serverless SQLite in `/tmp/inventory.db` with auto-seeded demo data.
+4. **Deploy:** Click **Deploy**. Your app is live instantly!
+
+---
+
+## ⚙️ Local Installation & Setup
 
 ### 1. Clone the repository
 ```bash

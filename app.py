@@ -6,15 +6,37 @@ from flask import Flask, redirect, render_template, request, url_for, flash, Res
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 
-app = Flask(__name__)
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
+app = Flask(
+    __name__,
+    template_folder=os.path.join(BASE_DIR, 'templates'),
+    static_folder=os.path.join(BASE_DIR, 'static')
+)
 
 # Secret key for session management and flash messages
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'inventra-secure-secret-key-2026')
 
-# Database Configuration (supports instance/ or workspace directory)
-db_path = os.path.join(app.instance_path, 'inventory.db')
-os.makedirs(app.instance_path, exist_ok=True)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', f'sqlite:///{db_path}')
+# Database Configuration (supports Vercel /tmp, local instance/, and custom DATABASE_URL)
+is_vercel = os.environ.get('VERCEL') == '1' or os.environ.get('VERCEL_ENV') is not None
+database_url = os.environ.get('DATABASE_URL')
+
+if database_url:
+    # Modern SQLAlchemy 2.0 requires postgresql:// instead of postgres://
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+elif is_vercel:
+    # On Vercel (Linux serverless), /tmp is the only writable directory.
+    import tempfile
+    tmp_dir = '/tmp' if os.path.exists('/tmp') else tempfile.gettempdir()
+    db_path = os.path.join(tmp_dir, 'inventory.db').replace('\\', '/')
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+else:
+    os.makedirs(app.instance_path, exist_ok=True)
+    db_path = os.path.join(app.instance_path, 'inventory.db')
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize SQLAlchemy
@@ -732,11 +754,18 @@ def contact():
 # Run Application
 # ==============================================================================
 
-if __name__ == "__main__":
+def init_db():
     with app.app_context():
         db.create_all()
         # Automatically populate demo data if newly initialized database is empty
         if Supplier.query.count() == 0 and Item.query.count() == 0:
             seed_initial_demo_data()
 
+# Ensure database tables and initial demo data are ready upon import (crucial for Vercel serverless)
+try:
+    init_db()
+except Exception as e:
+    print(f"Database initialization notice: {e}")
+
+if __name__ == "__main__":
     app.run(debug=True)
