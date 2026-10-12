@@ -15,8 +15,28 @@ app = Flask(
     static_folder=os.path.join(BASE_DIR, 'static')
 )
 
-# Reverse proxy support for Vercel
-app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+class PathNormalizationMiddleware:
+    """
+    WSGI Middleware to normalize URLs across local development and Vercel serverless.
+    Strips internal rewrite prefixes like /app.py, /api/index.py, /index.py if passed.
+    """
+    def __init__(self, wsgi_app):
+        self.wsgi_app = wsgi_app
+
+    def __call__(self, environ, start_response):
+        path = environ.get('PATH_INFO', '')
+        for prefix in ('/app.py', '/api/index.py', '/index.py', '/api/index', '/api'):
+            if path == prefix:
+                environ['PATH_INFO'] = '/'
+                break
+            elif path.startswith(prefix + '/'):
+                environ['PATH_INFO'] = path[len(prefix):]
+                break
+        return self.wsgi_app(environ, start_response)
+
+
+# Reverse proxy and path normalization support
+app.wsgi_app = PathNormalizationMiddleware(ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1))
 
 # Secret key for session management and flash messages
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'inventra-secure-secret-key-2026')
@@ -775,8 +795,42 @@ def debug_env():
 
 
 # ==============================================================================
-# Run Application
+# Error Handlers
 # ==============================================================================
+
+@app.errorhandler(404)
+def handle_404(e):
+    if request.path.startswith('/api/'):
+        return jsonify({"error": "Resource not found", "path": request.path}), 404
+    return render_template(
+        "error.html",
+        error_title="Page Not Found (404)",
+        error_message="The page or resource you requested could not be found. Please check the address or return to the main inventory dashboard.",
+        error_color="warning",
+        error_icon="exclamation-triangle-fill"
+    ), 404
+
+
+@app.errorhandler(500)
+def handle_500(e):
+    app.logger.error(f"Internal server error: {e}")
+    if request.path.startswith('/api/'):
+        return jsonify({"error": "Internal server error"}), 500
+    return render_template(
+        "error.html",
+        error_title="Server Error (500)",
+        error_message="An unexpected server error occurred while processing your request. Please try refreshing or return to the dashboard.",
+        error_color="danger",
+        error_icon="x-octagon-fill"
+    ), 500
+
+
+# ==============================================================================
+# Run & Initialization
+# ==============================================================================
+
+_db_initialized = False
+
 
 def init_db():
     with app.app_context():
@@ -784,6 +838,18 @@ def init_db():
         # Automatically populate demo data if newly initialized database is empty
         if Supplier.query.count() == 0 and Item.query.count() == 0:
             seed_initial_demo_data()
+
+
+@app.before_request
+def ensure_db_ready():
+    global _db_initialized
+    if not _db_initialized:
+        try:
+            init_db()
+        except Exception as e:
+            app.logger.warning(f"Database initialization notice on request: {e}")
+        _db_initialized = True
+
 
 # Ensure database tables and initial demo data are ready upon import (crucial for Vercel serverless)
 try:
