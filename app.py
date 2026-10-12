@@ -17,9 +17,9 @@ app = Flask(
 # Secret key for session management and flash messages
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'inventra-secure-secret-key-2026')
 
-# Database Configuration (supports Vercel /tmp, local instance/, and custom DATABASE_URL)
+# Database Configuration (supports Vercel /tmp, local instance/, and custom DATABASE_URL/POSTGRES_URL)
 is_vercel = os.environ.get('VERCEL') == '1' or os.environ.get('VERCEL_ENV') is not None
-database_url = os.environ.get('DATABASE_URL')
+database_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
 
 if database_url:
     # Modern SQLAlchemy 2.0 requires postgresql:// instead of postgres://
@@ -37,6 +37,10 @@ else:
     db_path = os.path.join(app.instance_path, 'inventory.db')
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_pre_ping': True,
+    'pool_recycle': 300,
+}
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize SQLAlchemy
