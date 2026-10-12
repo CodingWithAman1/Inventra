@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}INVENTRA - Smart Inventory Management System{% endblock %}</title>
+
+    <!-- Bootstrap 5.3.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Custom INVENTRA Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-inventra fixed-top shadow-sm">
+            <div class="container">
+                <!-- Brand / Logo -->
+                <a class="navbar-brand" href="{{ url_for('home') }}">
+                    <img src="{{ url_for('static', filename='asset/LOGO.png') }}" alt="Inventra Logo" width="36" height="36" class="rounded">
+                    <span>INVENTRA</span>
+                </a>
+
+                <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarInventraNav" aria-controls="navbarInventraNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarInventraNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint in ['home', None] %}active{% endif %}" href="{{ url_for('home') }}">
+                                <i class="bi bi-house-door"></i> Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'inventory' %}active{% endif %}" href="{{ url_for('inventory') }}">
+                                <i class="bi bi-box-seam"></i> Inventory
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'supplier' %}active{% endif %}" href="{{ url_for('supplier') }}">
+                                <i class="bi bi-buildings"></i> Suppliers
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'reports' %}active{% endif %}" href="{{ url_for('reports') }}">
+                                <i class="bi bi-graph-up-arrow"></i> Reports & Analytics
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'contact' %}active{% endif %}" href="{{ url_for('contact') }}">
+                                <i class="bi bi-envelope"></i> Contact
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- Global Search Form -->
+                    <form class="d-flex align-items-center gap-2 me-lg-2 my-2 my-lg-0" action="{{ url_for('search') }}" method="GET">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                            <input class="form-control border-start-0 ps-0" type="search" name="q" placeholder="Search products, suppliers..." value="{{ request.args.get('q', '') }}" aria-label="Search" required>
+                            <button class="btn btn-outline-success" type="submit">Search</button>
+                        </div>
+                    </form>
+
+                    <!-- Quick Action Links -->
+                    <div class="d-flex gap-2 align-items-center">
+                        <a href="{{ url_for('inventory') }}" class="btn btn-sm btn-success d-flex align-items-center gap-1 shadow-sm">
+                            <i class="bi bi-plus-circle"></i> <span>Manage</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Flash Messages Container -->
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show shadow-sm d-flex align-items-center gap-2 mb-3" role="alert">
+                        {% if category in ['success'] %}
+                            <i class="bi bi-check-circle-fill fs-5 text-success"></i>
+                        {% elif category in ['danger', 'error'] %}
+                            <i class="bi bi-exclamation-triangle-fill fs-5 text-danger"></i>
+                        {% elif category in ['warning'] %}
+                            <i class="bi bi-exclamation-circle-fill fs-5 text-warning"></i>
+                        {% else %}
+                            <i class="bi bi-info-circle-fill fs-5 text-info"></i>
+                        {% endif %}
+                        <div class="flex-grow-1">{{ message }}</div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content Area -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-inventra py-5 mt-5">
+        <div class="container">
+            <div class="row g-4">
+                <!-- Col 1: About -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <img src="{{ url_for('static', filename='asset/LOGO.png') }}" width="40" height="40" alt="Logo" class="rounded">
+                        <h4 class="mb-0 text-white fw-bold">INVENTRA</h4>
+                    </div>
+                    <p class="text-secondary small">
+                        A modern, streamlined inventory and supply chain tracking system designed to simplify product tracking, supplier relationships, stock alerts, and analytical reporting.
+                    </p>
+                    <div class="d-flex gap-2 mt-3">
+                        <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25">Flask 3.x</span>
+                        <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25">SQLAlchemy</span>
+                        <span class="badge bg-warning bg-opacity-25 text-warning border border-warning border-opacity-25">SQLite</span>
+                        <span class="badge bg-info bg-opacity-25 text-info border border-info border-opacity-25">Bootstrap 5</span>
+                    </div>
+                </div>
+
+                <!-- Col 2: Quick Links -->
+                <div class="col-lg-2 col-md-6">
+                    <h5 class="text-white mb-3">Quick Navigation</h5>
+                    <ul class="list-unstyled small d-flex flex-column gap-2 mb-0">
+                        <li><a href="{{ url_for('home') }}" class="text-decoration-none text-secondary"><i class="bi bi-chevron-right me-1 text-success"></i> Home</a></li>
+                        <li><a href="{{ url_for('inventory') }}" class="text-decoration-none text-secondary"><i class="bi bi-chevron-right me-1 text-success"></i> Inventory Catalog</a></li>
+                        <li><a href="{{ url_for('supplier') }}" class="text-decoration-none text-secondary"><i class="bi bi-chevron-right me-1 text-success"></i> Suppliers Directory</a></li>
+                        <li><a href="{{ url_for('reports') }}" class="text-decoration-none text-secondary"><i class="bi bi-chevron-right me-1 text-success"></i> Analytics & Reports</a></li>
+                        <li><a href="{{ url_for('contact') }}" class="text-decoration-none text-secondary"><i class="bi bi-chevron-right me-1 text-success"></i> Contact & Support</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Contact & Support -->
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="text-white mb-3">Contact & Support</h5>
+                    <ul class="list-unstyled small text-secondary d-flex flex-column gap-2 mb-0">
+                        <li class="d-flex align-items-center gap-2"><i class="bi bi-envelope text-success"></i> shruti.sharma6386@gmail.com</li>
+                        <li class="d-flex align-items-center gap-2"><i class="bi bi-telephone text-success"></i> +91 96906 83156</li>
+                        <li class="d-flex align-items-center gap-2"><i class="bi bi-geo-alt text-success"></i> Greater Noida, Uttar Pradesh, India</li>
+                        <li class="d-flex align-items-center gap-2"><i class="bi bi-clock text-success"></i> Mon - Fri: 9:00 AM - 6:00 PM</li>
+                    </ul>
+                </div>
+
+                <!-- Col 4: Developer Credit -->
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="text-white mb-3">Developer</h5>
+                    <p class="text-secondary small mb-2">
+                        Designed & Built with dedication by <strong class="text-white">Aman Sharma</strong>.
+                    </p>
+                    <div class="d-flex gap-2 mt-3">
+                        <a href="https://github.com/CodingWithAman1" target="_blank" rel="noopener noreferrer" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1">
+                            <i class="fa-brands fa-github"></i> GitHub
+                        </a>
+                        <a href="https://www.linkedin.com/in/aman-sharma-web/" target="_blank" rel="noopener noreferrer" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1">
+                            <i class="fa-brands fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-secondary opacity-25 my-4">
+
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center text-secondary small">
+                <div>
+                    &copy; 2026 <strong>INVENTRA</strong>. All Rights Reserved.
+                </div>
+                <div class="mt-2 mt-sm-0">
+                    Developed by <span class="text-white fw-bold">Aman Sharma</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5.3.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom Application JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
