@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from flask import Flask, redirect, render_template, request, url_for, flash, Response, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -13,6 +14,9 @@ app = Flask(
     template_folder=os.path.join(BASE_DIR, 'templates'),
     static_folder=os.path.join(BASE_DIR, 'static')
 )
+
+# Reverse proxy support for Vercel
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 # Secret key for session management and flash messages
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'inventra-secure-secret-key-2026')
@@ -189,9 +193,6 @@ def seed_initial_demo_data():
 
 @app.route("/")
 @app.route("/home")
-@app.route("/api/index.py")
-@app.route("/api/index")
-@app.route("/api")
 def home():
     """Main dashboard overview with KPIs, low stock warnings, and recent activity."""
     total_products = Item.query.count()
@@ -755,6 +756,22 @@ def contact():
         flash(f"Thank you, {name}! Your message has been received. Our team will contact you at {email}.", "success")
         return redirect(url_for("contact"))
     return render_template("contact.html")
+
+
+@app.route("/debug-env")
+def debug_env():
+    """Diagnostic route for Vercel serverless environment verification."""
+    return jsonify({
+        "path": request.path,
+        "full_path": request.full_path,
+        "environ_PATH_INFO": request.environ.get("PATH_INFO"),
+        "environ_REQUEST_URI": request.environ.get("REQUEST_URI"),
+        "environ_RAW_URI": request.environ.get("RAW_URI"),
+        "HTTP_X_MATCHED_PATH": request.environ.get("HTTP_X_MATCHED_PATH"),
+        "HTTP_X_FORWARDED_URI": request.environ.get("HTTP_X_FORWARDED_URI"),
+        "HTTP_X_FORWARDED_PATH": request.environ.get("HTTP_X_FORWARDED_PATH"),
+        "headers": {k: v for k, v in request.headers.items() if "cookie" not in k.lower() and "auth" not in k.lower()}
+    })
 
 
 # ==============================================================================
