@@ -185,6 +185,9 @@ def seed_initial_demo_data():
 
 @app.route("/")
 @app.route("/home")
+@app.route("/api/index.py")
+@app.route("/api/index")
+@app.route("/api")
 def home():
     """Main dashboard overview with KPIs, low stock warnings, and recent activity."""
     total_products = Item.query.count()
