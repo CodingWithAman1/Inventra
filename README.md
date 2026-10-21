@@ -154,7 +154,7 @@ http://127.0.0.1:5000
 **Aman Sharma**
 - **GitHub:** [@CodingWithAman1](https://github.com/CodingWithAman1)
 - **LinkedIn:** [Aman Sharma](https://www.linkedin.com/in/aman-sharma-web/)
-- **Email:** [shruti.sharma6386@gmail.com](mailto:shruti.sharma6386@gmail.com)
+- **Email:** [funwithcode8630@gmail.com](mailto:funwithcode8630@gmail.com)
 
 ---
 
